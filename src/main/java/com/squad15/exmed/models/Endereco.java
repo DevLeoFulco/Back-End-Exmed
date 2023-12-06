@@ -1,17 +1,12 @@
 package com.squad15.exmed.models;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-@Table(name = "tb_endereco")
-@Embeddable
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Endereco {
 
+@Data
+@Embeddable
+public class Endereco {
     private String rua;
     private String numero;
     private String complemento;
@@ -19,5 +14,4 @@ public class Endereco {
     private String cidade;
     private String estado;
     private String cep;
-
 }

@@ -1,36 +1,33 @@
 package com.squad15.exmed.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "indicacoes")
 public class Indicacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idIndicacao;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "indicador_id")
-    private Usuario indicador;
-
-    @ManyToOne
-    @JoinColumn(name = "indicado_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "indicado_id", referencedColumnName = "id")
     private Usuario indicado;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dataIndicacao;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "indicador_id", referencedColumnName = "id")
+    private Usuario indicador;
 
-    public void setIndicador(Usuario indicador) {
-        this.indicador = indicador;
+    public void setDataIndicacao(Date date) {
     }
-
-    public void setIndicado(Usuario indicado) {
-        this.indicado = indicado;
-    }
-
-
 }

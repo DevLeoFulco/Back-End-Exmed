@@ -1,34 +1,41 @@
 package com.squad15.exmed.controllers;
-import com.squad15.exmed.config.DadosTokenJWT;
-import com.squad15.exmed.dto.DadosAutenticacao;
+
+import com.squad15.exmed.configs.security.TokenService;
+import com.squad15.exmed.dtos.AutenticacaoDTO;
+import com.squad15.exmed.dtos.LoginResponseDTO;
+import com.squad15.exmed.interfaces.UsuarioRepository;
 import com.squad15.exmed.models.Usuario;
-import com.squad15.exmed.service.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
 
+
+import java.net.Authenticator;
 
 @RestController
-@RequestMapping("/login")
 public class AutenticacaoController {
 
     @Autowired
-    private AuthenticationManager manager;
-
+    private AuthenticationManager authenticationManager;
     @Autowired
-    private TokenService tokenService;
+    UsuarioRepository usuarioRepository;
+    @Autowired
+    TokenService tokenService;
 
-    @PostMapping
-    public ResponseEntity<DadosTokenJWT> efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
-        var authentication = manager.authenticate(authenticationToken);
-        var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody @Valid AutenticacaoDTO data) {
+        if (this.usuarioRepository.findByEmail(data.login()) == null) {
+            return ResponseEntity.badRequest().body("Usuário não encontrado");
+        }
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.senha());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
+
 }
